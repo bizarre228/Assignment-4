@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop Game with Text Above Containers</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .game-container {
+            display: flex;
+            align-items: center;
+            margin-top: 20px; /* Add some space between containers and items */
+        }
+
+        .object {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .container-box {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 10px; /* Add margin between containers */
+        }
+
+        .container-text {
+            margin-top: 10px; /* Add margin above the text */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-container">
+            <div class="container-box" id="box1">
+                <div class="container-text">Container 1</div>
+            </div>
+            <div class="container-box" id="box2">
+                <div class="container-text">Container 2</div>
+            </div>
+            <div class="container-box" id="box3">
+                <div class="container-text">Container 3</div>
+            </div>
+        </div>
+        <div class="game-container">
+            <img class="object" draggable="true" id="object1" src="image1.jpg" alt="Object 1">
+            <img class="object" draggable="true" id="object2" src="image2.jpg" alt="Object 2">
+            <img class="object" draggable="true" id="object3" src="image3.jpg" alt="Object 3">
+        </div>
+    </div>
+
+    <script>
+        const objects = document.querySelectorAll('.object');
+        const boxes = document.querySelectorAll('.container-box');
+
+        objects.forEach(object => {
+            object.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.id);
+            });
+        });
+
+        boxes.forEach(box => {
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const objectId = e.dataTransfer.getData('text/plain');
+                const draggedObject = document.getElementById(objectId);
+                const textElement = box.querySelector('.container-text'); // Get the text element
+
+                if (box.id === `box${objectId.charAt(objectId.length - 1)}`) {
+                    box.appendChild(draggedObject);
+                    if (textElement) {
+                        textElement.remove(); // Remove the text element
+                    }
+                    checkGameCompletion();
+                }
+            });
+        });
+
+        function checkGameCompletion() {
+            const objectsInBoxes = Array.from(boxes).map(box => box.children[0]);
+            const isGameComplete = objectsInBoxes.every(object => object !== null);
+
+            if (isGameComplete) {
+                alert('Congratulations! You completed the game.');
+            }
+        }
+    </script>
+</body>
+</html>
